@@ -1,0 +1,70 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "ThermoMaven",
+        "description": "Sign in with your ThermoMaven account. Tip: create a second (throwaway) account and share your devices to it from the official app, then sign in here with the throwaway. That way Home Assistant gets full live data without competing with your phone for the primary session.",
+        "data": {
+          "email": "Email",
+          "password": "Password",
+          "region": "Region"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid email or password.",
+      "cannot_connect": "Could not reach the ThermoMaven cloud."
+    },
+    "abort": {
+      "already_configured": "This account is already set up."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "base_battery":         { "name": "Base battery" },
+      "base_battery_status":  { "name": "Base battery status" },
+      "base_wifi_rssi":       { "name": "Base WiFi RSSI" },
+      "base_connect_status":  { "name": "Connection mode" },
+      "base_volume":          { "name": "Alarm volume" },
+      "base_online_status":   { "name": "Online status" },
+
+      "probe_temp_current":   { "name": "{probe} temperature" },
+      "probe_temp_ambient":   { "name": "{probe} ambient" },
+      "probe_temp_target":    { "name": "{probe} target" },
+      "probe_temp_t1":        { "name": "{probe} T1 (tip)" },
+      "probe_temp_t2":        { "name": "{probe} T2" },
+      "probe_temp_t3":        { "name": "{probe} T3 (center)" },
+      "probe_temp_t4":        { "name": "{probe} T4" },
+      "probe_temp_t5":        { "name": "{probe} T5 (rear)" },
+      "probe_battery":        { "name": "{probe} battery" },
+      "probe_cooking_state":  { "name": "{probe} cooking state" },
+      "probe_cooking_mode":   { "name": "{probe} cooking mode" },
+      "probe_cook_uuid":      { "name": "{probe} cook ID" },
+      "probe_probe_notes":    { "name": "{probe} label" },
+      "probe_time_elapsed":   { "name": "{probe} elapsed" },
+      "probe_time_remaining": { "name": "{probe} remaining" },
+      "probe_time_total":     { "name": "{probe} total" }
+    },
+    "binary_sensor": {
+      "base_online":          { "name": "Online" },
+      "base_wifi_configured": { "name": "WiFi configured" }
+    },
+    "number": {
+      "probe_target_temp_set": { "name": "{probe} target temperature" }
+    },
+    "select": {
+      "base_volume_select": {
+        "name": "Alarm volume",
+        "state": {
+          "high":   "High",
+          "medium": "Medium",
+          "quiet":  "Quiet"
+        }
+      }
+    },
+    "button": {
+      "probe_finish_cook": { "name": "{probe} finish cook" },
+      "probe_stop_cook":   { "name": "{probe} stop cook" }
+    }
+  }
+}

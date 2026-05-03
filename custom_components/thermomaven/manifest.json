@@ -1,0 +1,12 @@
+{
+  "domain": "thermomaven",
+  "name": "ThermoMaven",
+  "version": "0.2.0",
+  "config_flow": true,
+  "documentation": "https://github.com/kingchddg901/ha-thermomaven",
+  "issue_tracker": "https://github.com/kingchddg901/ha-thermomaven/issues",
+  "requirements": ["paho-mqtt>=1.6.1", "cryptography>=41.0.0"],
+  "dependencies": [],
+  "codeowners": ["@kingchddg901"],
+  "iot_class": "cloud_push"
+}
