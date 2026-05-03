@@ -1,0 +1,27 @@
+name: Feature request
+description: Something that would be useful but isn't there.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like the integration to do?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why?
+      description: A concrete cooking / automation scenario helps prioritize.
+    validations:
+      required: false
+  - type: textarea
+    id: protocol-notes
+    attributes:
+      label: Protocol notes
+      description: |
+        Have you seen the official app do this? If so, capturing the MQTT
+        traffic during the action (`apk_research/thermomaven/mqtt_listen.py`)
+        massively shortens the path from request to shipped feature.
+    validations:
+      required: false

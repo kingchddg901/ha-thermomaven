@@ -1,0 +1,53 @@
+name: New device model support
+description: A WT-series ThermoMaven model that isn't yet verified.
+labels: ["device-model", "enhancement"]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Device model
+      description: WT02 (P2) / WT06 (P4) / WT07 (G2) / WT09 (G4) / WT10 (G1)
+      placeholder: "WT06"
+    validations:
+      required: true
+  - type: dropdown
+    id: works
+    attributes:
+      label: Does it work?
+      options:
+        - "Yes, fully — all entities show up and behave correctly"
+        - "Partially — some entities work, others don't"
+        - "No — integration fails on this device"
+    validations:
+      required: true
+  - type: textarea
+    id: snapshot
+    attributes:
+      label: user:device:list MQTT snapshot
+      description: |
+        From `apk_research/thermomaven/mqtt_listen.py`, paste the first message
+        (`cmdType: user:device:list`) you see for this device. Redact userId
+        and deviceSn if you prefer. Schema is what matters.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: status-snapshot
+    attributes:
+      label: status:report MQTT snapshot
+      description: |
+        Paste one `<MODEL>:status:report` message from the per-device pub topic.
+        This shows us how multi-probe models structure the `probes` array.
+      render: json
+    validations:
+      required: false
+  - type: textarea
+    id: cmd-receipts
+    attributes:
+      label: Any cmdError responses?
+      description: |
+        If the integration's write entities returned errors, paste the
+        `device:cmd:receipt` payloads here. Per-model cmdError values vary.
+      render: json
+    validations:
+      required: false

@@ -229,6 +229,18 @@ logger:
 
 ---
 
+## More documentation
+
+- [docs/PROTOCOL.md](docs/PROTOCOL.md) — full reverse-engineering writeup of the
+  ThermoMaven cloud protocol (sign formula, embedded credential recovery,
+  MQTT envelope shapes, every cmdData schema, the lying-success caveat).
+- [docs/ENTITIES.md](docs/ENTITIES.md) — exhaustive list of every entity the
+  integration exposes, what fields they read, what attributes they carry.
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — how to extend the integration
+  (new device model, new write verb, new sensor), debug logging, release
+  process.
+- [CHANGELOG.md](CHANGELOG.md) — release history.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

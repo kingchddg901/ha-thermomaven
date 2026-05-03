@@ -1,0 +1,61 @@
+name: Bug report
+description: Something doesn't work the way the README says it should.
+labels: ["bug"]
+body:
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant version
+      placeholder: "2026.5.0"
+    validations:
+      required: true
+  - type: input
+    id: integration-version
+    attributes:
+      label: ha-thermomaven version
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: input
+    id: device-model
+    attributes:
+      label: ThermoMaven device model
+      description: WT02 / WT06 / WT07 / WT09 / WT10 / WT11. Visible on the device card or in MQTT logs.
+      placeholder: "WT11"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, what actually happened?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug logs
+      description: |
+        Enable debug logging for the integration:
+        ```yaml
+        logger:
+          default: info
+          logs:
+            custom_components.thermomaven: debug
+        ```
+        Reproduce the issue, then paste the relevant log lines (redact email/token).
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: mqtt-payload
+    attributes:
+      label: MQTT payload (if relevant)
+      description: |
+        For "device behaves unexpectedly" bugs, the raw MQTT payload helps a lot.
+        See `apk_research/thermomaven/mqtt_listen.py` in the recon companion repo
+        if you need to capture one. Redact `userId`, `deviceSn`, `cookUuid` if
+        you want — the schema is what matters.
+      render: json
+    validations:
+      required: false
