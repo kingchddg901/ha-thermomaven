@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-07-14
+
+Bug-fix release. Three issues reported by @solidcitizen against a
+4-probe WT09/G4 on HA 2026.7.1.
+
+### Fixed
+- **#1 — `select.*_alarm_volume` never registered.** `_ThermoMavenEntity`
+  extended `SensorEntity`, so mixing it into a `SelectEntity` with
+  `EntityCategory.CONFIG` tripped HA's SensorEntity guard. Base entity now
+  extends `Entity`; each concrete sensor class in `sensor.py` mixes in
+  `SensorEntity` itself. No behavior change for existing sensor entities.
+- **#2 — Per-probe binary sensors collided as `running_2`/`_3`/`_4` and
+  `problem_2`/`_3`/`_4` on multi-probe devices.** The `probe_cooking` and
+  `probe_overheat` translation keys existed only under `entity.sensor`;
+  HA looked them up under `entity.binary_sensor` and fell back to the
+  device-class name, which was identical across probes. Added the two keys
+  under the correct domain with the `{probe}` placeholder so entities
+  now name themselves "Probe 1 cooking", "Probe 2 cooking", etc.
+- **#3 — Blocking `ssl.SSLContext.load_verify_locations` /
+  `load_cert_chain` in the event loop during setup.** HA 2026.x's
+  blocking-call detector logs a warning on every startup. Moved the
+  entire SSLContext construction into the existing
+  `_download_and_extract_p12` executor job (renamed
+  `_download_and_build_ssl_context`) so the async setup path is fully
+  non-blocking.
+
+Thanks @solidcitizen for the clear diagnoses.
+
 ## [0.2.0] - 2026-05-02
 
 First public release.
@@ -61,5 +89,6 @@ First public release.
 - Finish / Stop buttons may report success while the device silently
   no-ops (probe still inserted/docked). See README & PROTOCOL.md.
 
-[Unreleased]: https://github.com/kingchddg901/ha-thermomaven/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/kingchddg901/ha-thermomaven/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/kingchddg901/ha-thermomaven/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kingchddg901/ha-thermomaven/releases/tag/v0.2.0

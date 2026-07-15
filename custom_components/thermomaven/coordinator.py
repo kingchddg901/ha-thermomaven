@@ -176,9 +176,12 @@ class ThermoMavenCoordinator:
         initial_topics = list(cert_data.get("subTopics") or [])
         self._mqtt_topics = list(initial_topics)
 
-        # Download and split the .p12 in a thread (HTTP + crypto are blocking).
-        cert_path, key_path, ca_path = await self.hass.async_add_executor_job(
-            self._download_and_extract_p12, cert_data
+        # Download, split, AND build the SSLContext in a thread — every step is
+        # blocking (HTTP + crypto + ssl.load_verify_locations/load_cert_chain
+        # both do disk I/O and crypto). Doing any of them inline in the async
+        # method trips HA 2026.x's blocking-call detector. See issue #3.
+        ssl_ctx = await self.hass.async_add_executor_job(
+            self._download_and_build_ssl_context, cert_data
         )
 
         # Build the MQTT client and start the loop in a worker thread.
@@ -187,12 +190,7 @@ class ThermoMavenCoordinator:
             protocol=mqtt.MQTTv311,
             clean_session=True,
         )
-        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-        ctx.minimum_version = ssl.TLSVersion.TLSv1_2
-        ctx.set_alpn_protocols(["x-amzn-mqtt-ca"])
-        ctx.load_verify_locations(cafile=ca_path)
-        ctx.load_cert_chain(certfile=cert_path, keyfile=key_path)
-        self._mqtt.tls_set_context(ctx)
+        self._mqtt.tls_set_context(ssl_ctx)
         self._mqtt.reconnect_delay_set(min_delay=5, max_delay=120)
         self._mqtt.on_connect = self._on_connect
         self._mqtt.on_disconnect = self._on_disconnect
@@ -229,9 +227,14 @@ class ThermoMavenCoordinator:
             self._tmp_dir = None
 
     # ---- p12 handling (executor) ----
-    def _download_and_extract_p12(
+    def _download_and_build_ssl_context(
         self, cert_data: dict[str, Any]
-    ) -> tuple[str, str, str]:
+    ) -> ssl.SSLContext:
+        """Run entirely off-loop. Fetches the .p12, verifies its MD5, splits
+        it into PEM files, then builds a fully-loaded SSLContext (the
+        `load_verify_locations` + `load_cert_chain` calls are blocking crypto
+        operations — must not run in the async loop). See issue #3.
+        """
         import requests  # locally — avoid pulling at module load time
 
         url = cert_data["p12Url"]
@@ -271,7 +274,14 @@ class ThermoMavenCoordinator:
         else:
             ca_path.write_bytes(AMAZON_ROOT_CA1.encode("utf-8"))
 
-        return str(cert_path), str(key_path), str(ca_path)
+        # Build the SSLContext HERE — the load_* calls are the reason we're
+        # in an executor to begin with (they hit disk + do crypto).
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        ctx.minimum_version = ssl.TLSVersion.TLSv1_2
+        ctx.set_alpn_protocols(["x-amzn-mqtt-ca"])
+        ctx.load_verify_locations(cafile=str(ca_path))
+        ctx.load_cert_chain(certfile=str(cert_path), keyfile=str(key_path))
+        return ctx
 
     # ---- paho callbacks (run in MQTT thread) ----
     def _on_connect(self, client, userdata, flags, rc):

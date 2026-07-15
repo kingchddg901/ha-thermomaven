@@ -1,7 +1,7 @@
 {
   "domain": "thermomaven",
   "name": "ThermoMaven",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "config_flow": true,
   "documentation": "https://github.com/kingchddg901/ha-thermomaven",
   "issue_tracker": "https://github.com/kingchddg901/ha-thermomaven/issues",

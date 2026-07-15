@@ -52,7 +52,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.entity import Entity, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
@@ -126,8 +126,17 @@ async def async_setup_entry(
 # ============================================================
 # Base entity
 # ============================================================
-class _ThermoMavenEntity(SensorEntity):
-    """Base entity that wires into the coordinator's per-device listener."""
+class _ThermoMavenEntity(Entity):
+    """Base entity that wires into the coordinator's per-device listener.
+
+    Intentionally extends only `Entity` — the platform-specific entity type
+    (SensorEntity / BinarySensorEntity / SelectEntity / NumberEntity /
+    ButtonEntity) is mixed in per-subclass. Making this a SensorEntity
+    would pollute the other platforms with sensor-specific behavior — most
+    visibly, HA's SensorEntity guard rejects `EntityCategory.CONFIG`, so a
+    select/number that tried to be a CONFIG entity would fail to register.
+    See fix for issue #1.
+    """
 
     _attr_has_entity_name = True
     _attr_should_poll = False
@@ -193,7 +202,7 @@ def _build_base_sensors(
     ]
 
 
-class _BaseBatterySensor(_ThermoMavenEntity):
+class _BaseBatterySensor(_ThermoMavenEntity, SensorEntity):
     _attr_translation_key = "base_battery"
     _attr_device_class = SensorDeviceClass.BATTERY
     _attr_native_unit_of_measurement = PERCENTAGE
@@ -209,7 +218,7 @@ class _BaseBatterySensor(_ThermoMavenEntity):
         return self._status().get(F_BATTERY_VALUE)
 
 
-class _BaseBatteryStatusSensor(_ThermoMavenEntity):
+class _BaseBatteryStatusSensor(_ThermoMavenEntity, SensorEntity):
     _attr_translation_key = "base_battery_status"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -222,7 +231,7 @@ class _BaseBatteryStatusSensor(_ThermoMavenEntity):
         return self._status().get(F_BATTERY_STATUS)
 
 
-class _BaseRssiSensor(_ThermoMavenEntity):
+class _BaseRssiSensor(_ThermoMavenEntity, SensorEntity):
     _attr_translation_key = "base_wifi_rssi"
     _attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
     _attr_native_unit_of_measurement = SIGNAL_STRENGTH_DECIBELS_MILLIWATT
@@ -238,7 +247,7 @@ class _BaseRssiSensor(_ThermoMavenEntity):
         return self._status().get(F_WIFI_RSSI)
 
 
-class _BaseConnectStatusSensor(_ThermoMavenEntity):
+class _BaseConnectStatusSensor(_ThermoMavenEntity, SensorEntity):
     _attr_translation_key = "base_connect_status"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -251,7 +260,7 @@ class _BaseConnectStatusSensor(_ThermoMavenEntity):
         return self._status().get(F_CONNECT_STATUS)
 
 
-class _BaseVolumeSensor(_ThermoMavenEntity):
+class _BaseVolumeSensor(_ThermoMavenEntity, SensorEntity):
     _attr_translation_key = "base_volume"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -264,7 +273,7 @@ class _BaseVolumeSensor(_ThermoMavenEntity):
         return self._status().get(F_VOLUME)
 
 
-class _BaseOnlineStatusSensor(_ThermoMavenEntity):
+class _BaseOnlineStatusSensor(_ThermoMavenEntity, SensorEntity):
     _attr_translation_key = "base_online_status"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -325,7 +334,7 @@ class _ProbeEntity(_ThermoMavenEntity):
         return p.get(key)
 
 
-class _ProbeTempSensor(_ProbeEntity):
+class _ProbeTempSensor(_ProbeEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
     # The device emits whatever unit it's configured for (F or C). The asset
@@ -398,7 +407,7 @@ class _ProbeTempSensor(_ProbeEntity):
         return attrs
 
 
-class _ProbeZoneTempSensor(_ProbeEntity):
+class _ProbeZoneTempSensor(_ProbeEntity, SensorEntity):
     """One of T1..T5 — the five thermistors along the probe shaft.
 
     Index 0 = T1 (tip of probe, deepest insertion = coldest if probe is buried
@@ -429,7 +438,7 @@ class _ProbeZoneTempSensor(_ProbeEntity):
         return raw / TEMP_SCALE if isinstance(raw, (int, float)) else None
 
 
-class _ProbeBatterySensor(_ProbeEntity):
+class _ProbeBatterySensor(_ProbeEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.BATTERY
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -443,7 +452,7 @@ class _ProbeBatterySensor(_ProbeEntity):
         return self._val(F_BATTERY_VALUE)
 
 
-class _ProbeStateSensor(_ProbeEntity):
+class _ProbeStateSensor(_ProbeEntity, SensorEntity):
     """Generic string passthrough — cookingState, cookingMode, cookUuid, probeNotes."""
 
     def __init__(self, coordinator, device_id, color, field, slug):
@@ -455,7 +464,7 @@ class _ProbeStateSensor(_ProbeEntity):
         return self._val(self._field)
 
 
-class _ProbeTimeSensor(_ProbeEntity):
+class _ProbeTimeSensor(_ProbeEntity, SensorEntity):
     _attr_native_unit_of_measurement = UnitOfTime.SECONDS
     _attr_device_class = SensorDeviceClass.DURATION
     _attr_state_class = SensorStateClass.MEASUREMENT

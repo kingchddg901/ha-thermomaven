@@ -47,7 +47,9 @@
     },
     "binary_sensor": {
       "base_online":          { "name": "Online" },
-      "base_wifi_configured": { "name": "WiFi configured" }
+      "base_wifi_configured": { "name": "WiFi configured" },
+      "probe_cooking":        { "name": "{probe} cooking" },
+      "probe_overheat":       { "name": "{probe} overheat" }
     },
     "number": {
       "probe_target_temp_set": { "name": "{probe} target temperature" }
