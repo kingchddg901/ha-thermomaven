@@ -12,6 +12,14 @@ Tested live against a ThermoMaven P1 (WT11) but designed to work with the entire
 > It uses the same cloud APIs the official app uses; if Auros changes the protocol, the
 > integration will break until updated.
 
+> [!IMPORTANT]
+> **Maintenance model.** This is a one-off scratch-an-itch project, not an actively-maintained
+> integration. Scoped bugs on the maintainer's own hardware (WT11/P1) or small fixes get
+> shipped quickly, but feature work, new device models, or sustained development effort are
+> unlikely. For a more actively-maintained ThermoMaven HA integration see
+> [djiesr/ThermoMaven-ha](https://github.com/djiesr/ThermoMaven-ha) — natural community home
+> for this ecosystem.
+
 ---
 
 ## Features
